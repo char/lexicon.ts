@@ -8,11 +8,12 @@ just for fun (for now!) ^-^
 - follows refs / unions
 - no `query` / `procedure` types yet
 - no handling of defaults / consts
-- no `array` yet
 
 ## example
 
 ```typescript
+import { Infer, LexiconUniverse } from "./lex/mod.ts";
+
 // 1. paste your lexicon JSON as a type definition:
 type HelloWorld = {
   "lexicon": "1",
@@ -38,7 +39,7 @@ type HelloWorld = {
         }
       }
     }
-  },
+  }
 };
 
 // 2. construct a lexicon universe

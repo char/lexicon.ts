@@ -1,13 +1,15 @@
 import { Simplify } from "./_util.ts";
+import { ArrayDefinition, InferArray } from "./array.ts";
 import {
+  BooleanDefinition,
   BytesDefinition,
   CidLinkDefinition,
+  InferBoolean,
   InferBytes,
   InferCidLink,
   InferInteger,
-  IntegerDefinition,
+  IntegerDefinition
 } from "./basic.ts";
-import { BooleanDefinition, InferBoolean } from "./boolean.ts";
 import { _AnyDef, _AnyU } from "./lexicon.ts";
 import { InferObject, ObjectDefinition } from "./object.ts";
 import { SplitPath } from "./path.ts";
@@ -21,6 +23,7 @@ export type InferDefinition<U extends _AnyU, Path extends string, Def extends _A
   : Def extends ObjectDefinition ? InferObject<U, Path, Def>
   : Def extends RefDefinition ? InferRef<U, Path, Def>
   : Def extends UnionDefinition ? InferUnion<U, Path, Def>
+  : Def extends ArrayDefinition ? InferArray<U, Path, Def>
   : Def extends StringDefinition ? InferString<Def>
   : Def extends IntegerDefinition ? InferInteger<Def>
   : Def extends BooleanDefinition ? InferBoolean<Def>

@@ -1,6 +1,11 @@
 import { Simplify } from "./_util.ts";
-import { BytesDefinition, CidLinkDefinition, IntegerDefinition } from "./basic.ts";
-import { BooleanDefinition } from "./boolean.ts";
+import { ArrayDefinition } from "./array.ts";
+import {
+  BooleanDefinition,
+  BytesDefinition,
+  CidLinkDefinition,
+  IntegerDefinition,
+} from "./basic.ts";
 import { ObjectDefinition } from "./object.ts";
 import { RecordDefinition } from "./record.ts";
 import { RefDefinition } from "./ref.ts";
@@ -23,6 +28,7 @@ export type _AnyDef =
   | ObjectDefinition
   | RefDefinition
   | UnionDefinition
+  | ArrayDefinition
   | StringDefinition
   | IntegerDefinition
   | BooleanDefinition
