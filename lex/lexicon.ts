@@ -13,7 +13,7 @@ import { StringDefinition } from "./string.ts";
 import { UnionDefinition } from "./union.ts";
 
 export type LexiconV1 = {
-  lexicon: "1";
+  lexicon: "1" | 1;
   id: string;
   defs: Record<string, _AnyDef | undefined>;
 };

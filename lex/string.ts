@@ -31,4 +31,4 @@ export type InferString<Def extends StringDefinition> =
   }[EmptyIfUndefined<Def["format"]>]
 
 type EmptyIfUndefined<S extends string | undefined> =
-  S extends undefined ? "" : S;
+  S extends string ? S : "";
