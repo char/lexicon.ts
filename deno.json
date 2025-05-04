@@ -1,0 +1,6 @@
+{
+  "tasks": {},
+  "lint": {
+    "rules": {"exclude": ["ban-types"]}
+  }
+}
