@@ -33,4 +33,5 @@ export type _AnyDef =
   | IntegerDefinition
   | BooleanDefinition
   | BytesDefinition
-  | CidLinkDefinition;
+  | CidLinkDefinition
+  | { type: unknown };
