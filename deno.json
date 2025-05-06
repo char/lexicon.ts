@@ -1,5 +1,9 @@
 {
+  "lock": false,
   "tasks": {},
+  "imports": {
+    "@char/lexicon.ts": "./lex/mod.ts"
+  },
   "lint": {
     "rules": {"exclude": ["ban-types"]}
   }
