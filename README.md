@@ -12,10 +12,10 @@ just for fun (for now!) ^-^
 ## example
 
 ```typescript
-import { Infer, LexiconUniverse } from "./lex/mod.ts";
+import { Infer, LexiconUniverse, Unconstify } from "./lex/mod.ts";
 
-// 1. paste your lexicon JSON as a type definition:
-type HelloWorld = {
+// 1. paste your lexicon JSON as a const object:
+const GREETING_LEXICON = {
   "lexicon": "1",
   "id": "com.example.hello-world.greeting",
   "defs": {
@@ -40,10 +40,10 @@ type HelloWorld = {
       }
     }
   }
-};
+} as const;
 
 // 2. construct a lexicon universe
-type U = LexiconUniverse<[HelloWorld]>;
+type U = LexiconUniverse<[Unconstify<typeof GREETING_LEXICON>]>;
 
 // 3. use Infer<> to resolve types from your Lexicon
 type Greeting = Infer<U, "com.example.hello-world.greeting">
