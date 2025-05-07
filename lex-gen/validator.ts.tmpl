@@ -1,0 +1,112 @@
+import { AnyDefinition, Infer, isKnownDefinitionType, KnownDefinition, LexiconV1 } from "@char/lexicon.ts";
+import { z } from "zod";
+
+type LexiconRef = (keyof $__UNIVERSE__ & string) | (`${keyof $__UNIVERSE__ & string}#${string}`) | (string & {});
+
+type LexiconFinder = <Id extends keyof $__UNIVERSE__ & string>(id: Id) => Promise<LexiconV1>;
+type LexiconValidator<Ref extends string> = {
+  validate: (o: unknown) => Infer<$__UNIVERSE__, Ref>
+};
+
+const splitLexiconRef = (s: string): [string, string] => {
+  const idx = s.indexOf("#");
+  if (idx === -1) return [s, "main"];
+  else return [s.substring(0, idx), s.substring(idx + 1)];
+}
+
+const fuseLexiconRef = (lex: string, defId: string) =>
+  defId === "main" ? lex : lex + "#" + defId;
+
+const resolveLexiconRef = (from: string, to: string): [string, string] => {
+  const [fromLex, _fromDef] = splitLexiconRef(from);
+  let [toLex, toDef] = splitLexiconRef(to);
+  if (toLex === "") toLex = fromLex;
+  return [toLex, toDef];
+}
+
+export class $__UNIVERSE__ValidationFactory {
+  constructor(
+    private findLexicon: LexiconFinder,
+  ) {}
+  
+  async #lookupDef(lexId: string, defId: string): Promise<AnyDefinition> {
+    const lexicon = await this.findLexicon(lexId as keyof $__UNIVERSE__ & string);
+    const def = lexicon.defs[defId];
+    if (!def) throw new Error(`could not find '${defId}' inside '${lexId}'`);
+    return def;
+  }
+
+  async #createZodSchema(path: string, def: KnownDefinition): Promise<z.ZodType> {
+    if (def.type === "object") {
+      const shape: Record<string, z.ZodType> = {};
+      for (const [name, subdef] of Object.entries(def.properties)) {
+        const required = def.required?.includes(name) ?? false;
+        let subschema = await this.#createZodSchema(path, subdef as KnownDefinition);
+        if (!required) subschema = subschema.optional();
+        shape[name] = subschema;
+      }
+      return z.object(shape);
+    }
+    if (def.type === "record") {
+      const schema = await this.#createZodSchema(path, def.record) as z.AnyZodObject;
+      return schema.extend({ "$type": z.literal(path) });
+    }
+    if (def.type === "array") {
+      const schema = await this.#createZodSchema(path, def.items);
+      return schema.array();
+    }
+    if (def.type === "string") {
+      // TODO: formats
+      return z.string();
+    }
+    if (def.type === "ref") {
+      const [newLex, newDefId] = resolveLexiconRef(path, def.ref);
+      const newDef = await this.#lookupDef(newLex, newDefId);
+      if (!isKnownDefinitionType(newDef)) throw new Error(`referent definition ('${newDefId} @ ${newLex}') is not of a known type`);
+      return this.#createZodSchema(fuseLexiconRef(newLex, newDefId), newDef);
+    }
+    if (def.type === "union") {
+      const schemae: z.ZodTypeAny[] = [];
+      for (const otherRef of def.refs) {
+        // TODO: $type for each
+        const [newLex, newDefId] = resolveLexiconRef(path, otherRef);
+        const newDef = await this.#lookupDef(newLex, newDefId);
+        if (!isKnownDefinitionType(newDef)) throw new Error(`referent definition ('${newDefId} @ ${newLex}') is not of a known type`);
+        let subschema = await this.#createZodSchema(fuseLexiconRef(newLex, newDefId), newDef);
+        if ("typeName" in subschema._def && subschema._def.typeName === "ZodObject") {
+          subschema = (subschema as z.AnyZodObject).extend({ "$type": z.literal(fuseLexiconRef(newLex, newDefId)) });
+        }
+        schemae.push(subschema);
+      }
+      try {
+        // @ts-expect-error wants a tuple for type inference, but we have an array
+        return z.discriminatedUnion("$type", schemae);
+      } catch {
+        // @ts-expect-error ditto
+        return z.union(schemae);
+      }
+    }
+    if (def.type === "boolean") return z.boolean();
+    if (def.type === "integer") return z.number();
+
+    return z.unknown();
+  }
+
+  async createValidator<const Ref extends LexiconRef>(
+    ref: Ref,
+  ): Promise<LexiconValidator<Ref>> {
+    const [lexId, defId] = splitLexiconRef(ref);
+    const def = await this.#lookupDef(lexId, defId);
+    if (!isKnownDefinitionType(def)) throw new Error("unknown definition type: " + def.type);
+    const zodSchema = await this.#createZodSchema(ref, def);
+
+    const validator: unknown = {
+      validate: (o: unknown): unknown => {
+        return zodSchema.parse(o);
+      }
+    }
+
+    // @ts-expect-error perf: avoid type checking here
+    return validator;
+  }
+}

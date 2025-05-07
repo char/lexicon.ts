@@ -1,5 +1,5 @@
 import { Simplify } from "./_util.ts";
-import { _AnyU } from "./lexicon.ts";
+import { _AnyUniverse } from "./lexicon.ts";
 import { InferObject, ObjectDefinition } from "./object.ts";
 
 export type RecordDefinition = {
@@ -8,6 +8,6 @@ export type RecordDefinition = {
   record: ObjectDefinition;
 };
 
-export type InferRecord<U extends _AnyU, Path extends string, Def extends RecordDefinition> = Simplify<
+export type InferRecord<U extends _AnyUniverse, Path extends string, Def extends RecordDefinition> = Simplify<
   { "$type": Path } & InferObject<U, Path, Def["record"]>
 >

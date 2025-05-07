@@ -1,8 +1,12 @@
 {
   "lock": false,
-  "tasks": {},
+  "tasks": {
+    "lex-gen": "deno run -A ./lex-gen/main.ts"
+  },
   "imports": {
-    "@char/lexicon.ts": "./lex/mod.ts"
+    "@char/lexicon.ts": "./lex/mod.ts",
+    "@char/lexicon.ts/atproto": "./atproto-lex/mod.ts",
+    "zod": "npm:zod@^3.24.4"
   },
   "lint": {
     "rules": {"exclude": ["ban-types"]}
