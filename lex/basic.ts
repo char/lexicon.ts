@@ -13,8 +13,10 @@ export type BytesDefinition = {
   maxLength?: number;
 }
 export type CidLinkDefinition = { type: "cid-link"; }
+export type UnknownDefinition = { type: "unknown"; }
 
 export type InferInteger<Def extends IntegerDefinition> = number;
 export type InferBoolean<Def extends BooleanDefinition> = boolean;
 export type InferBytes<Def extends BytesDefinition> = Uint8Array;
 export type InferCidLink<Def extends CidLinkDefinition> = CidString;
+export type InferUnknown<Def extends UnknownDefinition> = unknown;

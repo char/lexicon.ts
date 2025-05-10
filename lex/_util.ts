@@ -1,4 +1,8 @@
-export type Simplify<T> = {[K in keyof T]: T[K]} & {};
+export type Simplify<T> = {
+  [K in keyof T
+    as [T[K]] extends [never] ? never : K
+  ]: T[K]
+} & {};
 
 type _WritableArray<A> =
     A extends readonly [] ? []

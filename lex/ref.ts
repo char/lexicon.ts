@@ -1,5 +1,5 @@
+import { _AnyUniverse } from "./definition.ts";
 import { Infer } from "./infer.ts";
-import { _AnyUniverse } from "./lexicon.ts";
 import { ResolvePath } from "./path.ts";
 
 export type RefDefinition = { type: "ref", ref: string };

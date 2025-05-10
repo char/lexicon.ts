@@ -1,6 +1,6 @@
 import { Simplify } from "./_util.ts";
+import { AnyDefinition, _AnyUniverse } from "./definition.ts";
 import { InferDefinition } from "./infer.ts";
-import { AnyDefinition, _AnyUniverse } from "./lexicon.ts";
 
 export type ArrayDefinition = {
   type: "array";

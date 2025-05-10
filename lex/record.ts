@@ -1,5 +1,5 @@
 import { Simplify } from "./_util.ts";
-import { _AnyUniverse } from "./lexicon.ts";
+import { _AnyUniverse } from "./definition.ts";
 import { InferObject, ObjectDefinition } from "./object.ts";
 
 export type RecordDefinition = {
