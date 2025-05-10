@@ -1,6 +1,6 @@
 import { Simplify } from "./_util.ts";
 import { ArrayDefinition } from "./array.ts";
-import { BooleanDefinition, IntegerDefinition } from "./basic.ts";
+import { BooleanDefinition, IntegerDefinition, UnknownDefinition } from "./basic.ts";
 import { _AnyUniverse, AnyDefinition } from "./definition.ts";
 import { InferDefinition } from "./infer.ts";
 import { ObjectDefinition } from "./object.ts";
@@ -11,7 +11,7 @@ import { UnionDefinition } from "./union.ts";
 export type RPCParamsDefinition = {
   type: "params";
   required?: string[];
-  properties: Record<string, BooleanDefinition | IntegerDefinition | StringDefinition | ArrayDefinition>;
+  properties: Record<string, BooleanDefinition | IntegerDefinition | StringDefinition | UnknownDefinition | ArrayDefinition>;
 };
 
 type _MaybeUndefined<T, K, Required> = K extends Required ? T : T | undefined;
