@@ -1,0 +1,7 @@
+{
+  "imports": {
+    "@char/lexicon.ts": "../../lib/mod.ts",
+    "@std/fs": "jsr:@std/fs@^1.0.17",
+    "@std/path": "jsr:@std/path@^1.0.9"
+  }
+}

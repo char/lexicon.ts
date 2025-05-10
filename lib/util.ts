@@ -1,8 +1,16 @@
-export type Simplify<T> = {
-  [K in keyof T
-    as [T[K]] extends [never] ? never : K
-  ]: T[K]
-} & {};
+export type Simplify<T> = T extends object
+  ? { [K in keyof T as [T[K]] extends [never] ? never : K]: T[K]; } & {}
+  : T;
+
+export type IsDefinedAndKnown<T> =
+    unknown extends T ? false
+  : undefined extends T ? false
+  : true;
+
+export type WithDefault<T, Default, Required> =
+  Required extends true
+    ? T
+    : IsDefinedAndKnown<Default> extends true ? T | Default : T | undefined;
 
 type _WritableArray<A> =
     A extends readonly [] ? []
