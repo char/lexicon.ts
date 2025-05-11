@@ -12,6 +12,10 @@ export type WithDefault<T, Default, Required> =
     ? T
     : IsDefinedAndKnown<Default> extends true ? T | Default : T | undefined;
 
+export type PartialOnUndefined<T extends object> =
+  { [K in keyof T as undefined extends T[K] ? never : K]: T[K] } &
+  { [K in keyof T as undefined extends T[K] ? K : never]?: NonNullable<T[K]> };
+
 type _WritableArray<A> =
     A extends readonly [] ? []
   : A extends readonly [infer H, ...infer T] ? [Unconstify<H>, ...Unconstify<T>]

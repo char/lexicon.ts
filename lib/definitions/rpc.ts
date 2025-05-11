@@ -1,7 +1,7 @@
 import { InferDefinition } from "../infer.ts";
 import { LexiconDefinition } from "../lexicon.ts";
 import { LexiconUniverse } from "../universe.ts";
-import { Simplify } from "../util.ts";
+import { PartialOnUndefined, Simplify } from "../util.ts";
 import { ArrayDefinition } from "./array.ts";
 import { BooleanDefinition, IntegerDefinition, UnknownDefinition } from "./basic.ts";
 import { ObjectDefinition } from "./object.ts";
@@ -19,12 +19,14 @@ export type RPCParamsDefinition = {
 };
 
 type _InferRPCParams<U extends LexiconUniverse, Path extends string, Def extends RPCParamsDefinition, RequiredPropertyNames extends string> =
-  Simplify<{
-    [K in keyof Def["properties"]]: InferDefinition<
-      U, Path, Def["properties"][K],
-      K extends RequiredPropertyNames ? true : false
-    >
-  }>;
+  Simplify<
+    PartialOnUndefined<{
+      [K in keyof Def["properties"]]: InferDefinition<
+        U, Path, Def["properties"][K],
+        K extends RequiredPropertyNames ? true : false
+      >
+    }>
+  >;
 export type InferRPCParams<U extends LexiconUniverse, Path extends string, Def extends RPCParamsDefinition> =
   _InferRPCParams<
     U, Path, Def,
