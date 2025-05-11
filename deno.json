@@ -13,5 +13,8 @@
         "no-explicit-any"
       ]
     }
+  },
+  "compilerOptions": {
+    "noErrorTruncation": true
   }
 }

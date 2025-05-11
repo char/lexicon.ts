@@ -1,5 +1,6 @@
 import { ArrayDefinition, InferArray } from "./definitions/array.ts";
-import { BooleanDefinition, BytesDefinition, CIDLinkDefinition, InferBoolean, InferBytes, InferCIDLink, InferInteger, InferUnknown, IntegerDefinition, UnknownDefinition } from "./definitions/basic.ts";
+import { BooleanDefinition, BytesDefinition, InferBoolean, InferBytes, InferInteger, InferUnknown, IntegerDefinition, UnknownDefinition } from "./definitions/basic.ts";
+import { BlobDefinition, CIDLinkDefinition, InferBlob, InferCIDLink } from "./definitions/ipld.ts";
 import { InferObject, ObjectDefinition } from "./definitions/object.ts";
 import { InferRecord, RecordDefinition } from "./definitions/record.ts";
 import { InferRef, RefDefinition } from "./definitions/ref.ts";
@@ -20,8 +21,9 @@ export type InferDefinition<
     Def extends BooleanDefinition ? InferBoolean<Def, Required>
   : Def extends IntegerDefinition ? InferInteger<Def, Required>
   : Def extends BytesDefinition ? InferBytes<Def, Required>
-  : Def extends CIDLinkDefinition ? InferCIDLink<Def, Required>
   : Def extends UnknownDefinition ? InferUnknown<Def, Required>
+  : Def extends CIDLinkDefinition ? InferCIDLink<Def, Required>
+  : Def extends BlobDefinition ? InferBlob<Def, Required>
   : Def extends StringDefinition ? InferString<Def, Required>
   : Def extends ArrayDefinition ? InferArray<U, Path, Def, Required>
   : Def extends ObjectDefinition ? InferObject<U, Path, Def, Required>

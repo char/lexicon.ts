@@ -1,5 +1,4 @@
 import { IsDefinedAndKnown, Simplify, WithDefault } from "../util.ts";
-import { CIDString } from "./string.ts";
 
 export type NullDefinition = { type: "null"; }
 
@@ -40,12 +39,6 @@ export type InferBytes<_Def extends BytesDefinition, Required> =
   Simplify<
     WithDefault<Uint8Array, undefined, Required>
   >;
-
-export type CIDLinkDefinition = { type: "cid-link"; };
-export type InferCIDLink<_Def extends CIDLinkDefinition, Required> =
-  Simplify<
-    WithDefault<CIDString, undefined, Required>
-  >
 
 export type UnknownDefinition = { type: "unknown"; };
 export type InferUnknown<_Def extends UnknownDefinition, Required> =

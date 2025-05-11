@@ -2,6 +2,7 @@ export type { Infer, InferDefinition } from "./infer.ts";
 export type { LexiconDefinition, LexiconV1 } from "./lexicon.ts";
 export type { LexiconUniverse, MakeLexiconUniverse } from "./universe.ts";
 
+export type { BlobRef, CIDLink } from "./definitions/ipld.ts";
 export type {
   CIDString,
   DateTimeString,
