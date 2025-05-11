@@ -1,5 +1,6 @@
 {
   "tasks": {
+    "gen:atproto": "(cd pkg/codegen && deno run -A ./main.ts)"
   },
   "imports": {
     "@char/lexicon.ts": "./lib/mod.ts",
