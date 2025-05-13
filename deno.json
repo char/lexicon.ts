@@ -3,8 +3,9 @@
     "gen:atproto": "(cd pkg/codegen && deno run -A ./main.ts)"
   },
   "imports": {
-    "@char/lexicon.ts": "./lib/mod.ts",
-    "@char/lexicon.ts/atproto": "./pkg/atproto-lexica/mod.ts"
+    "@char/lexicon.ts/atproto": "./pkg/atproto-lexica/mod.ts",
+    "@char/lexicon.ts/": "./lib/",
+    "@char/lexicon.ts": "./lib/mod.ts"
   },
   "lint": {
     "rules": {
