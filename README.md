@@ -28,8 +28,9 @@ const GREETING_LEXICON = {
     }
   }
 } as const;
+type GreetingLexicon = Unconstify<typeof GREETING_LEXICON>;
 
-type U = MakeLexiconUniverse<[Unconstify<typeof GREETING_LEXICON>]>;
+type U = MakeLexiconUniverse<[GreetingLexicon]>;
 
 type Greeting = Infer<U, "com.example.hello-world.greeting">;
 /* => {
