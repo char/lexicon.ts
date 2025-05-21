@@ -1,4 +1,4 @@
-import type { LexiconDefinition, LexiconV1 } from "@char/lexicon.ts";
+import type { Infer, LexiconDefinition, LexiconUniverse, LexiconV1 } from "@char/lexicon.ts";
 import { ArrayDefinition } from "@char/lexicon.ts/definitions/array.ts";
 import { BooleanDefinition, BytesDefinition, IntegerDefinition } from "@char/lexicon.ts/definitions/basic.ts";
 import { CIDLinkDefinition } from "@char/lexicon.ts/definitions/ipld.ts";
@@ -26,6 +26,23 @@ const splitPath = (path: string): [lex: string, def: string] => {
 const joinPath = (lex: string, def: string) => {
   if (def === "main") return lex;
   return `${lex}#${def}`;
+}
+
+export type LexiconLookupFunction<U extends LexiconUniverse> = (ref: keyof U & string) => Promise<LexiconV1 | undefined>;
+type Validator<U extends LexiconUniverse, Ref extends keyof U & string> = (v: unknown) => Infer<U, Ref>;
+export const createValidator = async <U extends LexiconUniverse, Ref extends keyof U & string>(
+  lookup: LexiconLookupFunction<U>,
+  ref: Ref,
+  mode: "json" | "cbor" = "json"
+): Promise<Validator<U, Ref>> => {
+  const ctx: LexiconValidationContext = { path: ref, mode, lookupLexicon: lookup };
+  const [pathLex, pathDef] = splitPath(ctx.path);
+  const lexicon = await ctx.lookupLexicon(pathLex);
+  if (!lexicon) throw new Error("could not resolve lexicon at: " + pathLex);
+  const def = lexicon.defs[pathDef];
+  if (!def) throw new Error("could not resolve lexicon def at: " + ref);
+  const schema = await createSchema(ctx, def);
+  return (v: unknown) => schema.parse(v) as Infer<U, Ref>;
 }
 
 export const createSchema = async (ctx: Context, def: LexiconDefinition): Promise<z.ZodMiniType> => {
