@@ -1,3 +1,5 @@
+// deno-lint-ignore-file ban-types
+
 import type { Infer, LexiconDefinition, LexiconUniverse, LexiconV1 } from "@char/lexicon.ts";
 import { ArrayDefinition } from "@char/lexicon.ts/definitions/array.ts";
 import { BooleanDefinition, BytesDefinition, IntegerDefinition } from "@char/lexicon.ts/definitions/basic.ts";
@@ -29,8 +31,8 @@ const joinPath = (lex: string, def: string) => {
 }
 
 export type LexiconLookupFunction<U extends LexiconUniverse> = (ref: keyof U & string) => Promise<LexiconV1 | undefined>;
-type Validator<U extends LexiconUniverse, Ref extends keyof U & string> = (v: unknown) => Infer<U, Ref>;
-export const createValidator = async <U extends LexiconUniverse, Ref extends keyof U & string>(
+type Validator<U extends LexiconUniverse, Ref extends (keyof U & string) | (string & {})> = (v: unknown) => Infer<U, Ref>;
+export const createValidator = async <U extends LexiconUniverse, Ref extends (keyof U & string) | (string & {})>(
   lookup: LexiconLookupFunction<U>,
   ref: Ref,
   mode: "json" | "cbor" = "json"
