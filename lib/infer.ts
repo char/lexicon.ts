@@ -1,42 +1,48 @@
-import { ArrayDefinition, InferArray } from "./definitions/array.ts";
-import { BooleanDefinition, BytesDefinition, InferBoolean, InferBytes, InferInteger, InferUnknown, IntegerDefinition, UnknownDefinition } from "./definitions/basic.ts";
-import { BlobDefinition, CIDLinkDefinition, InferBlob, InferCIDLink } from "./definitions/ipld.ts";
-import { InferObject, ObjectDefinition } from "./definitions/object.ts";
-import { InferRecord, RecordDefinition } from "./definitions/record.ts";
-import { InferRef, RefDefinition } from "./definitions/ref.ts";
-import { InferRPC, RPCDefinition } from "./definitions/rpc.ts";
-import { InferString, StringDefinition } from "./definitions/string.ts";
-import { InferUnion, UnionDefinition } from "./definitions/union.ts";
-import { LexiconDefinition } from "./lexicon.ts";
+import { ArrayDefinition, ArrayProperty } from "./definitions/array.ts";
+import { BooleanDefinition, BooleanProperty, IntegerDefinition, IntegerProperty } from "./definitions/basic.ts";
+import { ObjectDefinition, ObjectProperty } from "./definitions/object.ts";
+import { RecordDefinition, RecordProperty, RecordPropertyWithPath } from "./definitions/record.ts";
+import { RefDefinition, RefProperty, RefPropertyWithUniverse, UnionDefinition, UnionProperty, UnionPropertyWithUniverse } from "./definitions/ref-union.ts";
+import { StringDefinition, StringProperty } from "./definitions/string.ts";
 import { SplitPath } from "./path.ts";
-import { LexiconUniverse } from "./universe.ts";
-import { Simplify } from "./util.ts";
+import { inputType, outputType } from "./property.ts";
+import { AnyUniverse } from "./universe.ts";
 
-export type InferDefinition<
-  U extends LexiconUniverse,
-  Path extends string,
-  Def extends LexiconDefinition,
-  Required
-> =
-    Def extends BooleanDefinition ? InferBoolean<Def, Required>
-  : Def extends IntegerDefinition ? InferInteger<Def, Required>
-  : Def extends BytesDefinition ? InferBytes<Def, Required>
-  : Def extends UnknownDefinition ? InferUnknown<Def, Required>
-  : Def extends CIDLinkDefinition ? InferCIDLink<Def, Required>
-  : Def extends BlobDefinition ? InferBlob<Def, Required>
-  : Def extends StringDefinition ? InferString<Def, Required>
-  : Def extends ArrayDefinition ? InferArray<U, Path, Def, Required>
-  : Def extends ObjectDefinition ? InferObject<U, Path, Def, Required>
-  : Def extends RecordDefinition ? InferRecord<U, Path, Def>
-  : Def extends RefDefinition ? InferRef<U, Path, Def, Required>
-  : Def extends UnionDefinition ? InferUnion<U, Path, Def, Required>
-  : Def extends RPCDefinition ? InferRPC<U, Path, Def>
-  : unknown;
+export type InferProperty<T extends any> =
+    T extends StringDefinition ? StringProperty<T>
+  : T extends IntegerDefinition ? IntegerProperty<T>
+  : T extends BooleanDefinition ? BooleanProperty<T>
+  : T extends ObjectDefinition ? ObjectProperty<T>
+  : T extends ArrayDefinition ? ArrayProperty<T>
+  : T extends RefDefinition ? RefProperty<T>
+  : T extends UnionDefinition ? UnionProperty<T>
+  : T extends RecordDefinition ? RecordProperty<T>
+  : never;
 
-export type Infer<U extends LexiconUniverse, Path extends (keyof U & string) | (string & {}), Required = true> = Simplify<
-  SplitPath<Path> extends [infer LexId extends keyof U, infer DefName extends string] ?
-    U[LexId]["defs"][DefName] extends infer Def extends LexiconDefinition
-      ? InferDefinition<U, Path, Def, Required>
-      : never
-    : never
->;
+type InferenceSymbol = typeof inputType | typeof outputType;
+
+type PreserveNullability<Base, T> = undefined extends Base ? T | undefined : T;
+
+export type DereferenceDeep<Path extends string, T extends object, U extends AnyUniverse, I extends InferenceSymbol> =
+  { [K in keyof T]:
+      NonNullable<T[K]> extends (string | number | boolean) ? T[K]
+    : NonNullable<T[K]> extends RefProperty<infer Def>
+      ? PreserveNullability<T[K], RefPropertyWithUniverse<Def, U, Path>[I]>
+    : NonNullable<T[K]> extends UnionProperty<infer Def>
+      ? PreserveNullability<T[K], UnionPropertyWithUniverse<Def, U, Path>[I]>
+    : NonNullable<T[K]> extends RecordProperty<infer Def>
+      ? PreserveNullability<T[K], DereferenceDeep<Path, RecordPropertyWithPath<Def, Path>[I], U, I>>
+    : NonNullable<T[K]> extends object ? PreserveNullability<T[K], DereferenceDeep<Path, NonNullable<T[K]>, U, I>>
+    : T[K] }
+
+type _Infer<U extends AnyUniverse, Path extends string, I extends InferenceSymbol> =
+  DereferenceDeep<
+    Path,
+    { root: InferProperty<U[SplitPath<Path>[0]]["defs"][SplitPath<Path>[1]]>[I] },
+    U, I
+  >["root"];
+
+export type Infer<U extends AnyUniverse, Path extends string> =
+  _Infer<U, Path, typeof inputType>;
+export type InferOutput<U extends AnyUniverse, Path extends string> =
+  _Infer<U, Path, typeof outputType>;

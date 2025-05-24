@@ -1,47 +1,26 @@
-import { IsDefinedAndKnown, Simplify, WithDefault } from "../util.ts";
+import { defaultType, inputType, outputType, Property } from "../property.ts";
 
-export type NullDefinition = { type: "null"; }
-
-export type BooleanDefinition = {
-  type: "boolean";
-  default?: boolean;
-  const?: boolean;
-}
-export type InferBoolean<Def extends BooleanDefinition, Required> =
-  IsDefinedAndKnown<Def["const"]> extends true
-    ? Def["const"]
-  : WithDefault<boolean, Def["default"], Required>;
-
-export type IntegerDefinition = {
-  type: "integer";
-  minimum?: number;
-  maximum?: number;
-  enum?: number[];
-  default?: number;
-  const?: number;
+export interface IntegerDefinition {
+  readonly type: "integer";
+  readonly enum?: readonly number[];
+  readonly const?: number;
+  readonly default?: number;
 }
 
-export type InferInteger<Def extends IntegerDefinition, Required> =
-  Simplify<
-    Def["enum"] extends number[]
-      ? Def["enum"][number]
-    : IsDefinedAndKnown<Def["const"]> extends true
-      ? Def["const"]
-    : WithDefault<number, Def["default"], Required>
-  >;
-
-export type BytesDefinition = {
-  type: "bytes";
-  minLength?: number;
-  maxLength?: number;
+export interface IntegerProperty<Def extends IntegerDefinition> extends Property<number> {
+  readonly [inputType]: Def["const"] extends number ? Def["const"] : number;
+  readonly [defaultType]: Def["default"] extends number ? Def["default"] : never;
+  readonly [outputType]: this[typeof inputType];
 }
-export type InferBytes<_Def extends BytesDefinition, Required> =
-  Simplify<
-    WithDefault<Uint8Array, undefined, Required>
-  >;
 
-export type UnknownDefinition = { type: "unknown"; };
-export type InferUnknown<_Def extends UnknownDefinition, Required> =
-  Simplify<
-    WithDefault<Record<string, unknown>, undefined, Required>
-  >;
+export interface BooleanDefinition {
+  readonly type: "boolean";
+  readonly const?: boolean;
+  readonly default?: boolean;
+}
+
+export interface BooleanProperty<Def extends BooleanDefinition> extends Property<boolean> {
+  readonly [inputType]: Def["const"] extends boolean ? Def["const"] : boolean;
+  readonly [defaultType]: Def["default"] extends boolean ? Def["default"] : never;
+  readonly [outputType]: this[typeof inputType];
+}

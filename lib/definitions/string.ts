@@ -1,31 +1,42 @@
-import { IsDefinedAndKnown, WithDefault } from "../util.ts";
+import { Property, defaultType, inputType, outputType } from "../property.ts";
 
-export type StringDefinition = {
-  type: "string";
-  format?:
-    | "at-identifier" | "at-uri" | "cid" | "datetime"
-    | "did" | "handle" | "nsid" | "tid" | "record-key"
-    | "uri" | "language";
-  maxLength?: number;
-  minLength?: number;
-  maxGraphemes?: number;
-  minGraphemes?: number;
-  knownValues?: string[];
-  enum?: string[];
-  default?: string;
-  const?: string;
+export interface StringDefinition {
+  readonly type: "string";
+  readonly enum?: readonly string[];
+  readonly knownValues?: readonly string[];
+  readonly const?: string;
+  readonly format?: | "at-identifier" | "at-uri" | "cid" | "datetime"
+                    | "did" | "handle" | "nsid" | "tid" | "record-key"
+                    | "uri" | "language";
+  readonly default?: string;
+  readonly minLength?: number;
+  readonly maxLength?: number;
+  readonly minGraphemes?: number;
+  readonly maxGraphemes?: number;
 }
 
-export type CIDString = string & {};
-export type HandleString = string & {};
-export type DateTimeString = string & {};
-export type NSIDString = string & {};
-export type TIDString = string & {};
-export type RecordKeyString = string & {};
-export type URIString = string & {};
-export type LanguageCode = string & {};
+export interface StringProperty<Def extends StringDefinition> extends Property<string> {
+  readonly [inputType]:
+      Def["enum"] extends readonly string[] ? Def["enum"][number]
+    : Def["const"] extends string ? Def["const"]
+    : Def["knownValues"] extends readonly string[] ? (Def["knownValues"][number] | (string & {}))
+    : InferStringValue<Def["format"]>;
+  readonly [defaultType]: Def["default"] extends string ? Def["default"] : never;
+  readonly [outputType]: this[typeof inputType];
+}
 
-type _StringType<Format extends StringDefinition["format"]> =
+declare const format: unique symbol;
+
+export type CIDString = string & { [format]?: "cid" };
+export type HandleString = string & { [format]?: "handle" };
+export type DateTimeString = string & { [format]?: "datetime" };
+export type NSIDString = string & { [format]?: "nsid" };
+export type TIDString = string & { [format]?: "tid" };
+export type RecordKeyString = string & { [format]?: "rkey" };
+export type URIString = string & { [format]?: "uri" };
+export type LanguageCode = string & { [format]?: "language" };
+
+type InferStringValue<Format extends StringDefinition["format"]> =
   undefined extends Format
     ? string
   : {
@@ -40,13 +51,4 @@ type _StringType<Format extends StringDefinition["format"]> =
     "record-key": RecordKeyString;
     "uri": URIString;
     "language": LanguageCode;
-  }[Format & {}];
-
-export type InferString<Def extends StringDefinition, Required> =
-  Def["knownValues"] extends string[]
-    ? Def["knownValues"][number] | (_StringType<Def["format"]> & {})
-  : Def["enum"] extends string[]
-    ? Def["enum"][number]
-  : IsDefinedAndKnown<Def["const"]> extends true
-    ? Def["const"]
-  : WithDefault<_StringType<Def["format"]>, Def["default"], Required>;
+  }[Format & {}]

@@ -1,16 +1,20 @@
-import { InferDefinition } from "../infer.ts";
-import { LexiconDefinition } from "../lexicon.ts";
-import { LexiconUniverse } from "../universe.ts";
-import { WithDefault } from "../util.ts";
+import { InferProperty } from "../infer.ts";
+import { defaultType, inputType, outputType, Property } from "../property.ts";
 
-export type ArrayDefinition<Items extends LexiconDefinition = LexiconDefinition> = {
-  type: "array";
-  items: Items;
-  minLength?: number;
-  maxLength?: number;
+export interface ArrayDefinition {
+  readonly type: "array";
+  readonly items: unknown;
+  readonly minLength?: number;
+  readonly maxLength?: number;
 }
 
-export type InferArray<U extends LexiconUniverse, Path extends string, Def extends ArrayDefinition, Required> =
-  Def extends ArrayDefinition<infer Items>
-    ? WithDefault<InferDefinition<U, Path, Items, true>[], undefined, Required>
-    : never;
+export interface ArrayProperty<Def extends ArrayDefinition> extends Property {
+  readonly kind: "array";
+
+  readonly inner: InferProperty<Def["items"]>;
+  readonly asArrayOrDerefNeeded: [this["inner"]] extends [never] ? this : this["inner"][];
+
+  readonly [inputType]: this["asArrayOrDerefNeeded"];
+  readonly [outputType]: this["asArrayOrDerefNeeded"];
+  readonly [defaultType]: never;
+}

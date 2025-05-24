@@ -1,42 +1,38 @@
+import { InferProperty } from "../infer.ts";
+import { defaultType, inputType, outputType, Property } from "../property.ts";
+import { Simplify } from "../util.ts";
 
-import { InferDefinition } from "../infer.ts";
-import { LexiconDefinition } from "../lexicon.ts";
-import { LexiconUniverse } from "../universe.ts";
-import { PartialOnUndefined, Simplify, WithDefault } from "../util.ts";
+export interface ObjectDefinition {
+  readonly type: "object";
+  readonly required?: readonly string[];
+  readonly nullable?: readonly string[];
+  readonly properties: Record<string, any>;
+}
 
-export type ObjectDefinition = {
-  type: "object";
-  required?: string[];
-  nullable?: string[];
-  properties: Record<string, LexiconDefinition>;
-};
+export interface ObjectProperty<Def extends ObjectDefinition> extends Property<Record<string, any>> {
+  readonly required: Def["required"] extends readonly string[] ? Def["required"][number] : never;
+  readonly nullable: Def["nullable"] extends readonly string[] ? Def["nullable"][number] : never;
 
+  readonly [inputType]: Simplify<
+      { -readonly [K in keyof Def["properties"] as K extends this["required"] ? K : never]:
+          K extends this["nullable"]
+            ? InferProperty<Def["properties"][K]>[typeof inputType] | null
+            : InferProperty<Def["properties"][K]>[typeof inputType] }
+    & { -readonly [K in keyof Def["properties"] as K extends this["required"] ? never : K]?:
+          K extends this["nullable"]
+            ? InferProperty<Def["properties"][K]>[typeof inputType] | null
+            : InferProperty<Def["properties"][K]>[typeof inputType] }
+  >;
 
-type _MaybeNullable<T, K, Nullable> = K extends Nullable ? T | null : T;
+  readonly [defaultType]: Simplify<
+    { [K in keyof Def["properties"]]: InferProperty<Def["properties"][K]>[typeof defaultType] }
+  >;
 
-type _InferObject<
-  U extends LexiconUniverse, Path extends string, Def extends ObjectDefinition,
-  Required,
-  RequiredFieldNames extends string, NullableFieldNames extends string,
-> = WithDefault<
-  Simplify<
-    PartialOnUndefined<
-      { [K in keyof Def["properties"]]:
-        _MaybeNullable<
-          InferDefinition<U, Path, Def["properties"][K],
-            K extends RequiredFieldNames ? true : false>,
-          K, NullableFieldNames>}>
-  >,
-  undefined, Required
->;
-
-type Options<R extends string[] | undefined> = R extends string[] ? R[number] : never;
-export type InferObject<
-  U extends LexiconUniverse, Path extends string,
-  Def extends ObjectDefinition,
-  Required,
-> = _InferObject<
-  U, Path, Def,
-  Required,
-  Options<Def["required"]>, Options<Def["nullable"]>
->;
+  readonly [outputType]: Simplify<
+    { -readonly [K in keyof Def["properties"]]:
+        K extends this["required"]
+          ? InferProperty<Def["properties"][K]>[typeof outputType]
+          : | InferProperty<Def["properties"][K]>[typeof outputType]
+            | InferProperty<Def["properties"][K]>[typeof defaultType] }
+  >;
+}

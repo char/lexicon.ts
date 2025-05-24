@@ -8,7 +8,7 @@ typescript trickshot for [ATProto Lexicon](https://atproto.com/specs/lexicon) de
 ## example
 
 ```typescript
-import { Infer, MakeLexiconUniverse, Unconstify } from "@char/lexicon.ts";
+import { Infer, MakeLexiconUniverse } from "@char/lexicon.ts";
 
 const GREETING_LEXICON = {
   "lexicon": 1,
@@ -28,9 +28,8 @@ const GREETING_LEXICON = {
     }
   }
 } as const;
-type GreetingLexicon = Unconstify<typeof GREETING_LEXICON>;
 
-type U = MakeLexiconUniverse<[GreetingLexicon]>;
+type U = MakeLexiconUniverse<[typeof GREETING_LEXICON]>;
 
 type Greeting = Infer<U, "com.example.hello-world.greeting">;
 /* => {
@@ -49,12 +48,12 @@ lexicon.ts/ $ # ./pkg/atproto-lexica/ now exists
 ```
 
 ```typescript
-import { Infer } from "@char/lexicon.ts";
+import { Infer, SimplifyDeep } from "@char/lexicon.ts";
 
 // imports from pkg/atproto-lexica/mod.ts:
 import { ATProtoUniverse } from "@char/lexicon.ts/atproto";
 
-type Post = Infer<ATProtoUniverse, "app.bsky.feed.post">;
+type Post = SimplifyDeep<Infer<ATProtoUniverse, "app.bsky.feed.post">>;
 /* => {
   $type: "app.bsky.feed.post";
   text: string;
