@@ -5,7 +5,8 @@ type Validator = (
   $v: unknown,
   $path: string,
   $error: (path: string, message: string) => void,
-  $next: () => void
+  $next: () => void,
+  ...rest: unknown[]
 ) => void;
 
 const _isString: Validator = ($v, $path, $error, $next) => {
@@ -21,8 +22,7 @@ const _isInteger: Validator = ($v, $path, $error, $next) => {
 }
 const isInteger = getBody(_isInteger)!;
 
-const $literal = undefined;
-const _isLiteral: Validator = ($v, $path, $error, $next) => {
+const _isLiteral: Validator = ($v, $path, $error, $next, $literal) => {
   if ($v !== $literal) $error($path, "expected literal: " + JSON.stringify($literal));
   $next();
 }
@@ -35,7 +35,7 @@ const _isObject: Validator = ($v, $path, $error, $next) => {
 }
 const isObject = getBody(_isObject)!;
 
-const _isOptional: Validator = ($v, $path, $error, $next) => {
+const _isOptional: Validator = ($v, _$path, _$error, $next) => {
   if ($v !== undefined) {
     $next();
   }
