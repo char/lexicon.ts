@@ -10,7 +10,8 @@ export interface ArrayDefinition {
 
 export interface ArrayProperty<Def extends ArrayDefinition> extends Property<any> {
   readonly inner: InferProperty<Def["items"]>;
-  
+
+  readonly kind: "array";
   readonly [inputType]: this["inner"][];
   readonly [outputType]: this["inner"][];
 }

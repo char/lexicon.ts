@@ -16,6 +16,7 @@ export interface StringDefinition {
 }
 
 export interface StringProperty<Def extends StringDefinition> extends Property<string> {
+  readonly kind: "string";
   readonly [inputType]:
       Def["enum"] extends readonly string[] ? Def["enum"][number]
     : Def["const"] extends string ? Def["const"]

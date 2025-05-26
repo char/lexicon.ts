@@ -20,6 +20,7 @@ export interface BooleanDefinition {
 }
 
 export interface BooleanProperty<Def extends BooleanDefinition> extends Property<boolean> {
+  readonly kind: "boolean";
   readonly [inputType]: Def["const"] extends boolean ? Def["const"] : boolean;
   readonly [defaultType]: Def["default"] extends boolean ? Def["default"] : never;
   readonly [outputType]: this[typeof inputType];
