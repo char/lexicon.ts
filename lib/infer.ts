@@ -5,7 +5,7 @@ import { RecordDefinition, RecordProperty, RecordPropertyWithPath } from "./defi
 import { RefDefinition, RefProperty, RefPropertyWithUniverse, UnionDefinition, UnionProperty, UnionPropertyWithUniverse } from "./definitions/ref-union.ts";
 import { StringDefinition, StringProperty } from "./definitions/string.ts";
 import { SplitPath } from "./path.ts";
-import { inputType, outputType } from "./property.ts";
+import { inputType, outputType, Property } from "./property.ts";
 import { AnyUniverse } from "./universe.ts";
 
 export type InferProperty<T extends any> =
@@ -17,6 +17,7 @@ export type InferProperty<T extends any> =
   : T extends RefDefinition ? RefProperty<T>
   : T extends UnionDefinition ? UnionProperty<T>
   : T extends RecordDefinition ? RecordProperty<T>
+  : T extends Property ? T
   : never;
 
 type InferenceSymbol = typeof inputType | typeof outputType;
