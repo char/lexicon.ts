@@ -1,5 +1,5 @@
 import { InferProperty } from "../infer.ts";
-import { defaultType, inputType, outputType, Property } from "../property.ts";
+import { inputType, outputType, Property } from "../property.ts";
 
 export interface ArrayDefinition {
   readonly type: "array";
@@ -8,13 +8,9 @@ export interface ArrayDefinition {
   readonly maxLength?: number;
 }
 
-export interface ArrayProperty<Def extends ArrayDefinition> extends Property {
-  readonly kind: "array";
-
+export interface ArrayProperty<Def extends ArrayDefinition> extends Property<any> {
   readonly inner: InferProperty<Def["items"]>;
-  readonly asArrayOrDerefNeeded: [this["inner"]] extends [never] ? this : this["inner"][];
-
-  readonly [inputType]: this["asArrayOrDerefNeeded"];
-  readonly [outputType]: this["asArrayOrDerefNeeded"];
-  readonly [defaultType]: never;
+  
+  readonly [inputType]: this["inner"][];
+  readonly [outputType]: this["inner"][];
 }
