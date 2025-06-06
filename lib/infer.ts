@@ -1,9 +1,10 @@
 import { ArrayDefinition, ArrayProperty } from "./definitions/array.ts";
-import { BooleanDefinition, BooleanProperty, IntegerDefinition, IntegerProperty } from "./definitions/basic.ts";
+import { BooleanDefinition, BooleanProperty, IntegerDefinition, IntegerProperty, UnknownDefinition, UnknownProperty } from "./definitions/basic.ts";
 import { BlobDefinition, BlobProperty, BlobRef, CIDLink, CIDLinkDefinition, CIDLinkProperty, LegacyBlobRef } from "./definitions/ipld.ts";
 import { ObjectDefinition, ObjectProperty } from "./definitions/object.ts";
 import { RecordDefinition, RecordProperty, RecordPropertyWithPath } from "./definitions/record.ts";
 import { RefDefinition, RefProperty, RefPropertyWithUniverse, UnionDefinition, UnionProperty, UnionPropertyWithUniverse } from "./definitions/ref-union.ts";
+import { ProcedureDefinition, ProcedureProperty, QueryDefinition, QueryProperty } from "./definitions/rpc.ts";
 import { StringDefinition, StringProperty } from "./definitions/string.ts";
 import { SplitPath } from "./path.ts";
 import { inputType, outputType, Property } from "./property.ts";
@@ -13,13 +14,16 @@ export type InferProperty<T extends any> =
     T extends StringDefinition ? StringProperty<T>
   : T extends IntegerDefinition ? IntegerProperty<T>
   : T extends BooleanDefinition ? BooleanProperty<T>
+  : T extends UnknownDefinition ? UnknownProperty
   : T extends BlobDefinition ? BlobProperty<T>
-  : T extends CIDLinkDefinition ? CIDLinkProperty<T>
+  : T extends CIDLinkDefinition ? CIDLinkProperty
   : T extends ObjectDefinition ? ObjectProperty<T>
   : T extends ArrayDefinition ? ArrayProperty<T>
   : T extends RefDefinition ? RefProperty<T>
   : T extends UnionDefinition ? UnionProperty<T>
   : T extends RecordDefinition ? RecordProperty<T>
+  : T extends ProcedureDefinition ? ProcedureProperty<T>
+  : T extends QueryDefinition ? QueryProperty<T>
   : T extends Property ? T
   : never;
 
@@ -31,6 +35,7 @@ export type DereferenceDeep<Path extends string, T extends object, U extends Any
   { [K in keyof T]:
       NonNullable<T[K]> extends (string | number | boolean) ? T[K]
     : NonNullable<T[K]> extends (BlobRef | LegacyBlobRef | CIDLink) ? T[K]
+    : unknown extends T[K] ? unknown
     : NonNullable<T[K]> extends RefProperty<infer Def>
       ? PreserveNullability<T[K], RefPropertyWithUniverse<Def, U, Path>[I]>
     : NonNullable<T[K]> extends UnionProperty<infer Def>

@@ -25,3 +25,9 @@ export interface BooleanProperty<Def extends BooleanDefinition> extends Property
   readonly [defaultType]: Def["default"] extends boolean ? Def["default"] : never;
   readonly [outputType]: this[typeof inputType];
 }
+
+export interface UnknownDefinition {
+  readonly type: "unknown";
+}
+
+export interface UnknownProperty extends Property<unknown> {}

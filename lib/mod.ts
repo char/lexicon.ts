@@ -7,6 +7,7 @@ export * from "./definitions/basic.ts";
 export * from "./definitions/object.ts";
 export * from "./definitions/record.ts";
 export * from "./definitions/ref-union.ts";
+export * from "./definitions/rpc.ts";
 export * from "./definitions/string.ts";
 
 export * from "./util.ts";

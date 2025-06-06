@@ -9,7 +9,7 @@ export interface CIDLink {
   readonly $link: CIDString;
 }
 
-export interface CIDLinkProperty<_Def extends CIDLinkDefinition> extends Property<CIDLink> {
+export interface CIDLinkProperty extends Property<CIDLink> {
 }
 
 export interface BlobDefinition {
