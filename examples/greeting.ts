@@ -1,4 +1,4 @@
-import { Infer, MakeLexiconUniverse, Unconstify } from "@char/lexicon.ts";
+import { Infer, MakeLexiconUniverse } from "@char/lexicon.ts";
 
 const GREETING_LEXICON = {
   "lexicon": 1,
@@ -19,6 +19,6 @@ const GREETING_LEXICON = {
   }
 } as const;
 
-type U = MakeLexiconUniverse<[Unconstify<typeof GREETING_LEXICON>]>;
+type U = MakeLexiconUniverse<[typeof GREETING_LEXICON]>;
 
 type Greeting = Infer<U, "com.example.hello-world.greeting">;

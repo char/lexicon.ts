@@ -1,5 +1,6 @@
 import { ArrayDefinition, ArrayProperty } from "./definitions/array.ts";
 import { BooleanDefinition, BooleanProperty, IntegerDefinition, IntegerProperty } from "./definitions/basic.ts";
+import { BlobDefinition, BlobProperty, BlobRef, CIDLink, CIDLinkDefinition, CIDLinkProperty, LegacyBlobRef } from "./definitions/ipld.ts";
 import { ObjectDefinition, ObjectProperty } from "./definitions/object.ts";
 import { RecordDefinition, RecordProperty, RecordPropertyWithPath } from "./definitions/record.ts";
 import { RefDefinition, RefProperty, RefPropertyWithUniverse, UnionDefinition, UnionProperty, UnionPropertyWithUniverse } from "./definitions/ref-union.ts";
@@ -12,6 +13,8 @@ export type InferProperty<T extends any> =
     T extends StringDefinition ? StringProperty<T>
   : T extends IntegerDefinition ? IntegerProperty<T>
   : T extends BooleanDefinition ? BooleanProperty<T>
+  : T extends BlobDefinition ? BlobProperty<T>
+  : T extends CIDLinkDefinition ? CIDLinkProperty<T>
   : T extends ObjectDefinition ? ObjectProperty<T>
   : T extends ArrayDefinition ? ArrayProperty<T>
   : T extends RefDefinition ? RefProperty<T>
@@ -27,6 +30,7 @@ type PreserveNullability<Base, T> = undefined extends Base ? T | undefined : T;
 export type DereferenceDeep<Path extends string, T extends object, U extends AnyUniverse, I extends InferenceSymbol> =
   { [K in keyof T]:
       NonNullable<T[K]> extends (string | number | boolean) ? T[K]
+    : NonNullable<T[K]> extends (BlobRef | LegacyBlobRef | CIDLink) ? T[K]
     : NonNullable<T[K]> extends RefProperty<infer Def>
       ? PreserveNullability<T[K], RefPropertyWithUniverse<Def, U, Path>[I]>
     : NonNullable<T[K]> extends UnionProperty<infer Def>
