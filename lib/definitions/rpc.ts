@@ -32,7 +32,7 @@ export interface ProcedureProperty<Def extends ProcedureDefinition> extends Prop
 
   _params: Def["parameters"] extends RPCParametersDefinition
     ? ObjectProperty<{ type: "object", required: Def["parameters"]["required"], properties: Def["parameters"]["properties"] }>
-    : Property<{}>;
+    : Property<undefined>;
 
   _input: Def["input"] extends RPCObjectDefinition
     ? Def["input"]["schema"] extends undefined
@@ -47,14 +47,14 @@ export interface ProcedureProperty<Def extends ProcedureDefinition> extends Prop
     : Property<undefined>;
 
   readonly [inputType]: {
-    parameters: ProcedureProperty<Def>["_params"][typeof inputType];
-    input: ProcedureProperty<Def>["_input"][typeof inputType];
-    output: ProcedureProperty<Def>["_output"][typeof inputType];
+    [K in "params" | "input" | "output" as
+      this[`_${K}`] extends Property<undefined> ? never : K
+    ]: this[`_${K}`][typeof inputType];
   };
   readonly [outputType]: {
-    parameters: ProcedureProperty<Def>["_params"][typeof outputType];
-    input: ProcedureProperty<Def>["_input"][typeof outputType];
-    output: ProcedureProperty<Def>["_output"][typeof outputType];
+    [K in "params" | "input" | "output" as
+      this[`_${K}`] extends Property<undefined> ? never : K
+    ]: this[`_${K}`][typeof outputType];
   };
 }
 
@@ -69,7 +69,7 @@ export interface QueryProperty<Def extends QueryDefinition> extends Property {
 
   _params: Def["parameters"] extends RPCParametersDefinition
     ? ObjectProperty<{ type: "object", required: Def["parameters"]["required"], properties: Def["parameters"]["properties"] }>
-    : Property<{}>;
+    : Property<undefined>;
     
   _output: Def["output"] extends RPCObjectDefinition
     ? Def["output"]["schema"] extends undefined
@@ -78,11 +78,13 @@ export interface QueryProperty<Def extends QueryDefinition> extends Property {
     : Property<undefined>;
 
   readonly [inputType]: {
-    parameters: QueryProperty<Def>["_params"][typeof inputType];
-    output: QueryProperty<Def>["_output"][typeof inputType];
+    [K in "params" | "output" as
+      this[`_${K}`] extends Property<undefined> ? never : K
+    ]: this[`_${K}`][typeof inputType];
   };
   readonly [outputType]: {
-    parameters: QueryProperty<Def>["_params"][typeof outputType];
-    output: QueryProperty<Def>["_output"][typeof outputType];
+    [K in "params" | "output" as
+      this[`_${K}`] extends Property<undefined> ? never : K
+    ]: this[`_${K}`][typeof outputType];
   };
 }

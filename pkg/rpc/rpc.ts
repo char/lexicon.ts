@@ -41,16 +41,21 @@ export class XRPC<U extends AnyUniverse> {
       return res.json();
     }
 
-    // TODO: validate better
     const body: { error: string; message?: string } = await res.json();
     throw new Error(`${body.error}: ${body.message ?? "no message"}`);
   }
+
   async get<M extends Queries<U>>(method: M, opts: { parameters: RPCInfer<U, M>["parameters"] }): Promise<RPCInfer<U, M>["output"]> {
     const url = new URL("/xrpc/" + method, this.baseUrl);
     if (opts.parameters) this.#addParameters(url, opts.parameters);
 
     const res = await fetch(url);
 
-    return res.json();
+    if (res.status === 200) {
+      return res.json();
+    }
+
+    const body: { error: string; message?: string } = await res.json();
+    throw new Error(`${body.error}: ${body.message ?? "no message"}`)
   }
 }
