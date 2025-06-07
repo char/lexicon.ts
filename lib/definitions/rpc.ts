@@ -15,7 +15,7 @@ export interface RPCObjectDefinition {
 }
 
 export interface RPCValue {
-  parameters?: object;
+  params?: object;
   input?: object;
   output?: object;
 }

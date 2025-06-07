@@ -27,7 +27,7 @@ export class XRPC<U extends AnyUniverse> {
 
   async call<M extends Procedures<U>>(method: M, opts: Omit<(RPCValue & RPCInfer<U, M>), "output">): Promise<(RPCValue & RPCInfer<U, M>)["output"]> {
     const url = new URL("/xrpc/" + method, this.baseUrl);
-    if (opts.parameters) this.#addParameters(url, opts.parameters);
+    if (opts.params) this.#addParameters(url, opts.params);
 
     const res = await fetch(url, {
       method: "POST",
@@ -45,9 +45,9 @@ export class XRPC<U extends AnyUniverse> {
     throw new Error(`${body.error}: ${body.message ?? "no message"}`);
   }
 
-  async get<M extends Queries<U>>(method: M, opts: { parameters: RPCInfer<U, M>["parameters"] }): Promise<RPCInfer<U, M>["output"]> {
+  async get<M extends Queries<U>>(method: M, opts: { params: RPCInfer<U, M>["params"] }): Promise<RPCInfer<U, M>["output"]> {
     const url = new URL("/xrpc/" + method, this.baseUrl);
-    if (opts.parameters) this.#addParameters(url, opts.parameters);
+    if (opts.params) this.#addParameters(url, opts.params);
 
     const res = await fetch(url);
 
