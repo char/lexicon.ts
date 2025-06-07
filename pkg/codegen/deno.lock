@@ -2,7 +2,8 @@
   "version": "5",
   "specifiers": {
     "jsr:@std/fs@^1.0.17": "1.0.17",
-    "jsr:@std/path@^1.0.9": "1.0.9"
+    "jsr:@std/path@^1.0.9": "1.0.9",
+    "npm:prettier@3": "3.5.1"
   },
   "jsr": {
     "@std/fs@1.0.17": {
@@ -13,6 +14,12 @@
     },
     "@std/path@1.0.9": {
       "integrity": "260a49f11edd3db93dd38350bf9cd1b4d1366afa98e81b86167b4e3dd750129e"
+    }
+  },
+  "npm": {
+    "prettier@3.5.1": {
+      "integrity": "sha512-hPpFQvHwL3Qv5AdRvBFMhnKo4tYxp0ReXiPn2bxkiohEX6mBeBwEpBSQTkD458RaaDKQMYSp4hX4UtfUTA5wDw==",
+      "bin": true
     }
   },
   "workspace": {
