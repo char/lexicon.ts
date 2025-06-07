@@ -4,6 +4,7 @@
   },
   "imports": {
     "@char/lexicon.ts/atproto": "./pkg/atproto-lexica/mod.ts",
+    "@char/lexicon.ts/rpc": "./pkg/rpc/rpc.ts",
     "@char/lexicon.ts/": "./lib/",
     "@char/lexicon.ts": "./lib/mod.ts"
   },

@@ -1,0 +1,6 @@
+{
+  "lock": false,
+  "imports": {
+    "@char/lexicon.ts": "../../lib/mod.ts"
+  }
+}

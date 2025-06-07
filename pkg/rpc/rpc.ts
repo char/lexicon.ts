@@ -1,6 +1,4 @@
-import type { AnyUniverse, Infer } from "@char/lexicon.ts";
-import { ATProtoUniverse } from "@char/lexicon.ts/atproto";
-import { RPCValue } from "@char/lexicon.ts/definitions/rpc.ts";
+import type { AnyUniverse, Infer, RPCValue } from "@char/lexicon.ts";
 
 type Procedures<U extends AnyUniverse> = string & keyof { [K in keyof U as U[K]["defs"]["main"]["type"] extends "procedure" ? K : never]: void };
 type Queries<U extends AnyUniverse> = string & keyof { [K in keyof U as U[K]["defs"]["main"]["type"] extends "query" ? K : never]: void };
@@ -8,7 +6,7 @@ type Queries<U extends AnyUniverse> = string & keyof { [K in keyof U as U[K]["de
 type _RPCInfer1<T> = T extends RPCValue ? T : never;
 type RPCInfer<U extends AnyUniverse, K extends string> = _RPCInfer1<Infer<U, K>>;
 
-export class XRPC<U extends AnyUniverse> {
+export class XRPC<U extends AnyUniverse> { 
   constructor(public baseUrl: string) {}
 
   #addParameters(url: URL, parameters: object): void {
@@ -56,12 +54,3 @@ export class XRPC<U extends AnyUniverse> {
     return res.json();
   }
 }
-
-const rpc = new XRPC<ATProtoUniverse>("https://public.api.bsky.app");
-
-const result = await rpc.get("com.atproto.repo.listRecords", {
-  parameters: {
-    repo: "did:t",
-    collection: "com.example.records"
-  }
-});
